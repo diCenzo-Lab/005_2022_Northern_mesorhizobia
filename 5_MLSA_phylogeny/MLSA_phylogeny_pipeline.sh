@@ -13,6 +13,8 @@ mkdir Phylogeny/ # Make directory
 
 # Download proteomes
 cat ../3_ANI_matrix/Input_files/Mesorhizobium.csv Input_files/Brucella.csv > Input_files/MLSA.csv
+grep -v 'R7Astar' Input_files/Mesorhizobium.csv | grep -v 'R7ANSstar' > temp.txt # Get rid of redundant strains
+mv temp.txt Input_files/Mesorhizobium.csv # Get rid of redundant strains
 perl Scripts/parseGenomeList.pl Input_files/MLSA.csv # Parse the NCBI genome table to get info to download genomes
 sed -i 's/__/_/g' Input_files/genomeList.txt # Fix the double __
 sed -i 's/sp._/sp_/' Input_files/genomeList.txt # Fix the double __
@@ -44,6 +46,6 @@ perl Scripts/combineAlignments.pl > Phylogeny/MLSA_final_alignment.fasta # Conca
 
 # Prepare Phylogeny
 cd Phylogeny/ # Change directory
-raxmlHPC-HYBRID-AVX2 -T 10 -s MLSA_final_alignment.fasta -N 5 -n test_phylogeny -f a -p 12345 -x 12345 -m PROTGAMMAAUTO
-/datadisk1/Bioinformatics_programs/openmpi/bin/./mpiexec --map-by node -np 5 raxmlHPC-HYBRID-AVX2 -T 4 -s MLSA_final_alignment.fasta -N autoMRE -n MLSA_phylogeny -f a -p 12345 -x 12345 -m PROTGAMMALG
+raxmlHPC-HYBRID-AVX2 -T 28 -s MLSA_final_alignment.fasta -N 5 -n test_phylogeny -f a -p 12345 -x 12345 -m PROTGAMMAAUTO
+raxmlHPC-HYBRID-AVX2 -T 28 -s MLSA_final_alignment.fasta -N autoMRE -n MLSA_phylogeny -f a -p 12345 -x 12345 -m PROTGAMMALGF
 cd ../ # Change directory

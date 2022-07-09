@@ -19,6 +19,8 @@ mkdir NCBI_analysis/Genomes/
 
 # Get protein sequences
 cp ../3_ANI_matrix/Input_files/Mesorhizobium.csv Input_files/
+grep -v 'R7Astar' Input_files/Mesorhizobium.csv | grep -v 'R7ANSstar' > temp.txt # Get rid of redundant strains
+mv temp.txt Input_files/Mesorhizobium.csv # Get rid of redundant strains
 perl Scripts/parseGenomeList.pl Input_files/Mesorhizobium.csv # Parse the NCBI genome table to get info to download genomes
 sed -i 's/__/_/g' Input_files/genomeList.txt # Fix the double __
 sed -i 's/sp._/sp_/' Input_files/genomeList.txt # Remove the period after sp
@@ -35,9 +37,9 @@ rm temp_1.txt # Remove file
 perl Scripts/extractFaaFromGBFF.pl # Make faa files from the GenBank files
 perl Scripts/modifyFasta.pl combined_proteomes_HMM.faa > combined_proteomes_HMM_modified.faa # Modify the fasta file for easy extraction
 
-# Download and prepare HMM databases
+# Download HMM databases
 wget ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz # get the Pfam HMM files
-wget ftp://ftp.jcvi.org/pub/data/TIGRFAMs//TIGRFAMs_15.0_HMM.LIB.gz # get the TIGRFAM HMM files
+wget https://ftp.ncbi.nlm.nih.gov/hmm/TIGRFAMs/release_15.0/TIGRFAMs_15.0_HMM.LIB.gz # get the TIGRFAM HMM files
 gunzip Pfam-A.hmm.gz # unzip the Pfam files
 gunzip TIGRFAMs_15.0_HMM.LIB.gz # unzip the TIGRFAM files
 mv Pfam-A.hmm hmmDatabaseFiles/Pfam-A.hmm # move the Pfam files
@@ -83,14 +85,15 @@ cd Phylogenies
 raxmlHPC-HYBRID-AVX2 -T 1 -s ../SymbioticProteins/NodA_trimal.faa -N 5 -n test_phylogeny_nodA -f a -p 12345 -x 12345 -m PROTGAMMAAUTO
 raxmlHPC-HYBRID-AVX2 -T 1 -s ../SymbioticProteins/NodB_trimal.faa -N 5 -n test_phylogeny_nodB -f a -p 12345 -x 12345 -m PROTGAMMAAUTO
 raxmlHPC-HYBRID-AVX2 -T 1 -s ../SymbioticProteins/NodC_trimal.faa -N 5 -n test_phylogeny_nodC -f a -p 12345 -x 12345 -m PROTGAMMAAUTO
-/datadisk1/Bioinformatics_programs/openmpi/bin/./mpiexec --map-by node -np 16 raxmlHPC-HYBRID-AVX2 -T 1 -s ../SymbioticProteins/NodA_trimal.faa -N autoMRE -n NodA -f a -p 12345 -x 12345 -m PROTGAMMAJTT
-/datadisk1/Bioinformatics_programs/openmpi/bin/./mpiexec --map-by node -np 16 raxmlHPC-HYBRID-AVX2 -T 1 -s ../SymbioticProteins/NodB_trimal.faa -N autoMRE -n NodB -f a -p 12345 -x 12345 -m PROTGAMMADUMMY2
-/datadisk1/Bioinformatics_programs/openmpi/bin/./mpiexec --map-by node -np 16 raxmlHPC-HYBRID-AVX2 -T 1 -s ../SymbioticProteins/NodC_trimal.faa -N autoMRE -n NodC -f a -p 12345 -x 12345 -m PROTGAMMADUMMY2
+mpiexec --map-by node -np 10 raxmlHPC-HYBRID-AVX2 -T 1 -s ../SymbioticProteins/NodA_trimal.faa -N autoMRE -n NodA -f a -p 12345 -x 12345 -m PROTGAMMAJTTF
+mpiexec --map-by node -np 10 raxmlHPC-HYBRID-AVX2 -T 1 -s ../SymbioticProteins/NodB_trimal.faa -N autoMRE -n NodB -f a -p 12345 -x 12345 -m PROTGAMMADUMMY2F
+mpiexec --map-by node -np 10 raxmlHPC-HYBRID-AVX2 -T 1 -s ../SymbioticProteins/NodC_trimal.faa -N autoMRE -n NodC -f a -p 12345 -x 12345 -m PROTGAMMADUMMY2F
+cd ..
 
 # Determine replicons with proteins
 grep '>' SymbioticProteins/*.faa | sed 's/>//' | sed 's/__/\t/g' | sed 's/:/\t/' | cut -f2,4 | sort -u | grep -v 'Mesorhizobium_alhagi_CCNWXJ12' > Symbiotic_gene_replicons.txt
-cut -f2,2 Symbiotic_gene_replicons_complete.txt > Symbiotic_gene_replicons_complete2.txt
-grep 'LOCUS' Genome_files/* | grep -f 'Symbiotic_gene_replicons_complete2.txt' > Replicons_with_symbiotic_genes.txt
+cut -f2,2 Symbiotic_gene_replicons.txt > Symbiotic_gene_replicons2.txt
+grep 'LOCUS' Genome_files/* | grep -f 'Symbiotic_gene_replicons2.txt' > Replicons_with_symbiotic_genes.txt
 
 ## NCBI analysis
 

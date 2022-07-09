@@ -15,7 +15,7 @@ close($HMM);
 # Perform the HMMsearches
 foreach $i (@HMMs) {
 	system("hmmbuild HMM_files/$i.hmm HMM_files/$i.txt"); # build the HMM profiles
-	system("hmmsearch --cpu 6 HMM_files/$i.hmm combined_proteomes_HMM.faa > HMMsearch/$i.txt"); # do the hmmsearch
+	system("hmmsearch --cpu 28 HMM_files/$i.hmm combined_proteomes_HMM.faa > HMMsearch/$i.txt"); # do the hmmsearch
 	system("perl Scripts/parseHMMsearch.pl HMMsearch/$i.txt > HMMsearchParsed/$i.txt"); # parse the hmmsearch output
 	system("perl Scripts/extractHMMsearchHits.pl HMMsearchParsed/$i.txt > HMMsearchHits/$i.faa"); # extract the hmmsearch hits
 }

@@ -14,7 +14,7 @@ close($HMM);
 
 # Perform the HMMscans
 foreach $i (@HMMs) {
-	system("hmmscan --cpu 6 hmmDatabaseFiles/converted_combined.hmm HMMsearchHits/$i.faa > HMMscan/$i.txt");
+	system("hmmscan --cpu 28 hmmDatabaseFiles/converted_combined.hmm HMMsearchHits/$i.faa > HMMscan/$i.txt");
 	system("perl Scripts/parseHMMscan.pl HMMscan/$i.txt > HMMscanParsed/$i.csv");
 	system("perl Scripts/HMMscanTopHit.pl HMMscanParsed/$i.csv > HMMscanTop/$i.csv");
 }

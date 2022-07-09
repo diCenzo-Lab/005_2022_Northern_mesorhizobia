@@ -4,7 +4,9 @@ mkdir intermediaryFiles/
 mkdir Genome_files/ # Make directory
 
 # Download the Mesorhizobium genomes
-cat Input_files/Complete_chromosome.csv Input_files/Representative.csv > Input_files/Mesorhizobium.csv
+cat Input_files/Complete_chromosome.csv Input_files/Representative.csv > Input_files/Mesorhizobium.csv # Combine files
+grep -v 'R7Astar' Input_files/Mesorhizobium.csv | grep -v 'R7ANSstar' > temp.txt # Get rid of redundant strains
+mv temp.txt Input_files/Mesorhizobium.csv # Get rid of redundant strains
 perl Scripts/parseGenomeList.pl Input_files/Mesorhizobium.csv # Parse the NCBI genome table to get info to download genomes
 sed -i 's/__/_/g' Input_files/genomeList.txt # Fix the double __
 sed -i 's/sp._/sp_/' Input_files/genomeList.txt # Remove the period after sp
